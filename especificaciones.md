@@ -1,7 +1,5 @@
 # Modonize Blender
 
-# Modonize Blender
-
 Se trata de un complemento para blender que pretende llevar la experiencia de usuario de Luxology Modo a Blender, poniendo especial foco en el modelado.
 
 ## Características
