@@ -19,12 +19,14 @@ bl_info = {
 from . import preferences
 from . import keymaps
 from . import selection
+from . import transform
 from . import ui
 
 modules = (
     preferences,
     keymaps,
     selection,
+    transform,
     ui,
 )
 

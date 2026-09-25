@@ -11,6 +11,7 @@ selección que ese modo tenía guardada (memoria independiente por modo).
 import bpy
 
 from . import mode_memory
+from .. import _state
 
 MODES = ("VERT", "EDGE", "FACE")
 
@@ -78,8 +79,8 @@ class ModozCycleSelectMode(bpy.types.Operator):
 
 
 def register():
-    bpy.utils.register_class(ModozCycleSelectMode)
+    _state.register_class_safe(ModozCycleSelectMode)
 
 
 def unregister():
-    bpy.utils.unregister_class(ModozCycleSelectMode)
+    _state.unregister_class_safe(ModozCycleSelectMode)

@@ -8,6 +8,8 @@ from bpy.props import (
     PointerProperty,
 )
 
+from . import _state
+
 
 class ModonizePreferences(bpy.types.AddonPreferences):
     bl_idname = __package__
@@ -41,11 +43,12 @@ class ModonizePreferences(bpy.types.AddonPreferences):
         default="LOOP",
     )
 
-    # --- Apartados para futuras fases (transformación W/E/R y tecla F) --
+    # --- Fase 2: sistema de transformación (herramientas Modo W/E/R) ------
     enable_transform: BoolProperty(
-        name="Sistema de transformación (fase futura)",
-        description="Reservado para la fase 2 (atajos W/E/R). Aún no implementado.",
-        default=False,
+        name="Sistema de transformación (W/E/R)",
+        description="Herramientas Modo Move/Rotate/Scale en el viewport: "
+        "gizmo de Blender + arrastre en el plano del eje cartesiano dominante.",
+        default=True,
     )
     enable_focus: BoolProperty(
         name="Tecla F (fase futura)",
@@ -72,9 +75,9 @@ _classes = (ModonizePreferences,)
 
 def register():
     for cls in _classes:
-        bpy.utils.register_class(cls)
+        _state.register_class_safe(cls)
 
 
 def unregister():
     for cls in reversed(_classes):
-        bpy.utils.unregister_class(cls)
+        _state.unregister_class_safe(cls)

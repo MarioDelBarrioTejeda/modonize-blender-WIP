@@ -52,8 +52,8 @@ class ModonizePanel(bpy.types.Panel):
 
 
 def register():
-    bpy.utils.register_class(ModonizePanel)
+    _state.register_class_safe(ModonizePanel)
 
 
 def unregister():
-    bpy.utils.unregister_class(ModonizePanel)
+    _state.unregister_class_safe(ModonizePanel)

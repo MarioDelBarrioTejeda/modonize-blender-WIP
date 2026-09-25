@@ -79,8 +79,8 @@ class ModozSelectDoubleClick(bpy.types.Operator):
 
 
 def register():
-    bpy.utils.register_class(ModozSelectDoubleClick)
+    _state.register_class_safe(ModozSelectDoubleClick)
 
 
 def unregister():
-    bpy.utils.unregister_class(ModozSelectDoubleClick)
+    _state.unregister_class_safe(ModozSelectDoubleClick)
