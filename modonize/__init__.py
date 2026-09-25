@@ -20,6 +20,7 @@ from . import preferences
 from . import keymaps
 from . import selection
 from . import transform
+from . import editor
 from . import ui
 
 modules = (
@@ -27,6 +28,7 @@ modules = (
     keymaps,
     selection,
     transform,
+    editor,
     ui,
 )
 

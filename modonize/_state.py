@@ -43,3 +43,26 @@ def register_tool_safe(clazz):
     except Exception:
         pass
     bpy.utils.register_tool(clazz)
+
+
+def prestada_off(kc, keymap_names, types):
+    """'Tecla prestada': desactiva los items ajenos de `types` en los keymaps
+    indicados. Devuelve [(km, kmi)] para restaurarlos con `prestada_restore`."""
+    out = []
+    for name in keymap_names:
+        km = kc.keymaps.get(name)
+        if km is None:
+            continue
+        for kmi in km.keymap_items:
+            if kmi.type in types and kmi.active:
+                out.append((km, kmi))
+                kmi.active = False
+    return out
+
+
+def prestada_restore(items):
+    for km, kmi in items:
+        try:
+            kmi.active = True
+        except Exception:
+            pass

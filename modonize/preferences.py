@@ -51,9 +51,17 @@ class ModonizePreferences(bpy.types.AddonPreferences):
         default=True,
     )
     enable_focus: BoolProperty(
-        name="Tecla F (fase futura)",
-        description="Reservado para la fase 3 (enfoque en la selección). Aún no implementado.",
+        name="Tecla F (enfoque)",
+        description="Enfoca la selección en 3D view, nodos y outliner.",
         default=False,
+    )
+
+    # --- Fase 3: atajos de editor (selección up/down, bevel, loops, subdiv) --
+    enable_editor: BoolProperty(
+        name="Atajos de edición",
+        description="Atajos de edit mode: [UP]/[DOWN] prev/next, [SHIFT+UP/DOWN] "
+        "more/less, [B] bevel, [L] loops, [D] subdividir, y tecla [F] de foco.",
+        default=True,
     )
 
     def draw(self, context):
@@ -68,6 +76,7 @@ class ModonizePreferences(bpy.types.AddonPreferences):
         layout.separator()
         layout.prop(self, "enable_transform")
         layout.prop(self, "enable_focus")
+        layout.prop(self, "enable_editor")
 
 
 _classes = (ModonizePreferences,)
