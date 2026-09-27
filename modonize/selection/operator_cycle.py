@@ -11,6 +11,7 @@ selección que ese modo tenía guardada (memoria independiente por modo).
 import bpy
 
 from . import mode_memory
+from . import theme
 from .. import _state
 
 MODES = ("VERT", "EDGE", "FACE")
@@ -66,6 +67,10 @@ class ModozCycleSelectMode(bpy.types.Operator):
         for obj in objs:
             mesh = obj.data
             mode_memory.restore_mode(mesh, next_mode)
+
+        # 4) Aplicar la paleta de color del modo (el msgbus también lo haría;
+        #    aquí es directo y determinista).
+        theme.apply(next_mode)
 
         return {"FINISHED"}
 
