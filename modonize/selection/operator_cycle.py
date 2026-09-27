@@ -17,15 +17,7 @@ MODES = ("VERT", "EDGE", "FACE")
 
 
 def _current_mode(context):
-    ts = context.tool_settings
-    sel = ts.mesh_select_mode  # tuple (vert, edge, face)
-    if sel[0]:
-        return "VERT"
-    if sel[1]:
-        return "EDGE"
-    if sel[2]:
-        return "FACE"
-    return "VERT"
+    return _state.current_component_mode(context)
 
 
 def _set_mode(context, mode):

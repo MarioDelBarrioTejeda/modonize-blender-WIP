@@ -15,6 +15,23 @@ def prefs(context):
     return context.preferences.addons[ADDON_PACKAGE].preferences
 
 
+def current_component_mode(context):
+    """Modo de selección de componentes activo en edit mode: VERT/EDGE/FACE.
+
+    Lee el tuplo ``tool_settings.mesh_select_mode`` (igual que el ciclo de
+    modos del addon). Devuelve VERT si no hay ninguno activo (fallback).
+    """
+    try:
+        sel = context.tool_settings.mesh_select_mode
+    except AttributeError:
+        return "VERT"
+    if sel[0]:
+        return "VERT"
+    if sel[1]:
+        return "EDGE"
+    return "FACE"
+
+
 def register_class_safe(cls):
     """Registra una clase. Si ya estaba registrada (reload/fallo parcial), la
     desregistra primero y la registra de nuevo (idempotente)."""

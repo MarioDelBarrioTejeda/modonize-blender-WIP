@@ -52,7 +52,7 @@ def register():
     add("DOWN_ARROW", "mesh.select_prev_item")
     add("UP_ARROW", "mesh.select_more", shift=True)
     add("DOWN_ARROW", "mesh.select_less", shift=True)
-    add("B", "mesh.bevel")
+    add("B", "modoz.bevel")
     add("L", "modoz.select_loop")
     add("D", "mesh.subdivide")
 

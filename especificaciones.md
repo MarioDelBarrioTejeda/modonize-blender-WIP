@@ -48,11 +48,15 @@ Cambia la herramienta de rotar, es muy similar a la versión de Blender con la d
 
 - Atajo [B]
 
-- El viselado funcionara como un *extrude* + *inset* en **modo poligono**
+- El biselado depende del modo de selección de componentes:
 
-- Como *bevel* de vertices en **modo vertices**
+  - En **modo aristas** (por defecto) bisela las aristas; la propia
+    herramienta ofrece la opción de actuar sobre los **vértices**.
 
-- 
+  - En **modo vértices** bisela los **vértices**.
+
+  - En **modo polígono** hace un *extrude* sobre las normales con toda la
+    selección **unida** (no por separado, no individual). 
 
 ### Otros atajos
 
