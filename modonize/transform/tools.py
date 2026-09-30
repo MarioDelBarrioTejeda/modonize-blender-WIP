@@ -26,8 +26,28 @@ def _builtin_slots():
     return {"W": "builtin.move", "E": "builtin.rotate", "R": "builtin.scale"}
 
 
+def _immediate_slots():
+    """W/E/R transforman al instante con los operadores de G/R/S."""
+    return {
+        "W": "transform.translate",
+        "E": "transform.rotate",
+        "R": "transform.resize",
+    }
+
+
+_EDITOR_KEYMAPS = (
+    "3D View",
+    "UV Editor",
+    "Graph Editor",
+    "Dope Sheet",
+    "NLA Editor",
+    "Node Editor",
+)
+_DISABLE_KEYMAPS = ("3D View", "Object Mode", "Mesh") + _EDITOR_KEYMAPS
+
+
 def _disable_defaults(kc, keys):
-    for km_name in ("3D View", "Object Mode", "Mesh"):
+    for km_name in _DISABLE_KEYMAPS:
         km = kc.keymaps.get(km_name)
         if km is None:
             continue
@@ -48,15 +68,25 @@ def register():
     if kc is None:
         return
 
-    _disable_defaults(kc, set(_builtin_slots()))
+    _disable_defaults(kc, {"W", "E", "R"})
 
-    km = kc.keymaps.get("3D View")
-    if km is None:
-        return
-    for key, tool in _builtin_slots().items():
-        kmi = km.keymap_items.new("wm.tool_set_by_id", key, "PRESS", head=True)
-        kmi.properties.name = tool
-        _addon_keymaps.append((km, kmi))
+    # W/E/R unificados en todos los editores: 3D, UV, keyframes (Graph/Dope/NLA)
+    # y nodos. transform.translate/rotate/resize se adaptan al contexto activo.
+    for km_name in _EDITOR_KEYMAPS:
+        km = kc.keymaps.get(km_name)
+        if km is None:
+            continue
+        if prefs.transform_immediate:
+            # Modo inmediato: W/E/R transforman al instante, como G/R/S.
+            for key, opname in _immediate_slots().items():
+                kmi = km.keymap_items.new(opname, key, "PRESS", head=True)
+                _addon_keymaps.append((km, kmi))
+        else:
+            # Modo herramienta: W/E/R seleccionan el tool nativo (gizmo).
+            for key, tool in _builtin_slots().items():
+                kmi = km.keymap_items.new("wm.tool_set_by_id", key, "PRESS", head=True)
+                kmi.properties.name = tool
+                _addon_keymaps.append((km, kmi))
 
 
 def unregister():

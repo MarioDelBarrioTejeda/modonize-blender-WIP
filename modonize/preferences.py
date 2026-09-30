@@ -47,7 +47,14 @@ class ModonizePreferences(bpy.types.AddonPreferences):
     enable_transform: BoolProperty(
         name="Sistema de transformación (W/E/R)",
         description="Herramientas Modo Move/Rotate/Scale en el viewport: "
-        "gizmo de Blender + arrastre en el plano del eje cartesiano dominante.",
+        "W mover, E rotar, R escalar.",
+        default=True,
+    )
+    transform_immediate: BoolProperty(
+        name="Transformación inmediata",
+        description="ON: W/E/R transforman al instante como G/R/S de Blender "
+        "(modal directo). OFF: W/E/R seleccionan la herramienta (gizmo) "
+        "heredando el comportamiento nativo de Blender.",
         default=True,
     )
     enable_focus: BoolProperty(
@@ -75,6 +82,10 @@ class ModonizePreferences(bpy.types.AddonPreferences):
 
         layout.separator()
         layout.prop(self, "enable_transform")
+        if self.enable_transform:
+            box = layout.box()
+            box.label(text="Modo W/E/R", icon="TRANSFORM_MOVE")
+            box.prop(self, "transform_immediate")
         layout.prop(self, "enable_focus")
         layout.prop(self, "enable_editor")
 

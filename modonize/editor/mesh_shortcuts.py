@@ -7,8 +7,10 @@
 - [B]                  -> bevel (sustituye el box-select de Blender)
 - [L]                  -> seleccionar loop (sustituye select-linked)
 - [D]                  -> subdividir malla
+- [S]                  -> extrude (como la E de Blender)
+- [SHIFT+S]            -> edge crease
 
-Los defaults de Blender que chocan (B box-select, L select-linked, D) se
+Los defaults de Blender que chocan (B box-select, L select-linked, D, S) se
 desactivan temporalmente y se restauran al apagar el addon ("tecla prestada").
 """
 
@@ -41,7 +43,7 @@ def register():
     global _addon_keymaps, _prestada, _temporarily_disabled
 
     # Desactivar defaults que reemplazamos (B, L, D) en 'Mesh'.
-    _prestada = _state.prestada_off(kc, ("Mesh",), {"B", "L", "D"})
+    _prestada = _state.prestada_off(kc, ("Mesh",), {"B", "L", "D", "S"})
     _temporarily_disabled = list(_prestada)
 
     def add(key, op, shift=False, head=True):
@@ -55,6 +57,9 @@ def register():
     add("B", "modoz.bevel")
     add("L", "modoz.select_loop")
     add("D", "mesh.subdivide")
+    ## Extrude (replicamos el E de Blender) y Edge Crease en Shift+S.
+    add("S", "view3d.edit_mesh_extrude_move_normal")
+    add("S", "transform.edge_crease", shift=True)
 
 
 def unregister():

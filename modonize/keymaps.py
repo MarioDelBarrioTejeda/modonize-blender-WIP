@@ -85,6 +85,16 @@ def _bind_keymaps(cycle_key):
                 "modoz.cycle_select_mode", cycle_key, "PRESS", head=True
             ))
         )
+
+    # El UV Editor comparte el modo de seleccion de componentes con la vista
+    # 3D (tool_settings.mesh_select_mode): que Espacio tambien ciclote ahi.
+    uv_km = kc.keymaps.get("UV Editor")
+    if uv_km is not None:
+        bound.append(
+            (uv_km, uv_km.keymap_items.new(
+                "modoz.cycle_select_mode", cycle_key, "PRESS", head=True
+            ))
+        )
     return bound
 
 
