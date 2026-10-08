@@ -55,8 +55,10 @@ Cambia la herramienta de rotar, es muy similar a la versión de Blender con la d
 
   - En **modo vértices** bisela los **vértices**.
 
-  - En **modo polígono** hace un *extrude* sobre las normales con toda la
-    selección **unida** (no por separado, no individual). 
+  - En **modo polígono** hace un *inset* con **Depth** sobre la selección
+    **unida** (no por separado, no individual). El arrastre del ratón ajusta la
+    *Depth* (profundidad por normal, como el Ctrl del inset nativo) y la rueda
+    el grosor del borde; clic o Return confirma, Esc o botón derecho cancela.
 
 ### Otros atajos
 

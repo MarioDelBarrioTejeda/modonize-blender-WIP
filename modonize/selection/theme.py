@@ -184,8 +184,15 @@ def apply(mode):
             pass
 
 
-def restore():
-    """Restaura los valores originales del tema y del overlay de las vistas."""
+def reset_display():
+    """Vuelve el tema y los overlays a sus valores originales SIN perder la
+    línea base capturada.
+
+    Se usa al salir de Edit Mode (o cuando no hay una malla en edición): la
+    paleta del modo de componentes solo debe existir dentro de Edit Mode. A
+    diferencia de ``restore()``, conserva ``_ORIG_THEME``/``_ORIG_OVERLAY`` para
+    poder volver a aplicar la paleta al reentrar en edición.
+    """
     th = _theme()
     for prop, value in _ORIG_THEME.items():
         try:
@@ -200,6 +207,12 @@ def restore():
                 sp.overlay.show_wireframes = orig[1]
             except Exception:
                 pass
+
+
+def restore():
+    """Restaura los valores originales del tema y del overlay de las vistas y
+    descarta la línea base (para desregistrar el addon)."""
+    reset_display()
     _ORIG_THEME.clear()
     _ORIG_OVERLAY.clear()
 
@@ -221,6 +234,9 @@ def _on_change(*_args, **_kwargs):
         obj = bpy.context.active_object
         if obj is not None and obj.type == "MESH" and obj.mode == "EDIT":
             apply(_state.current_component_mode(bpy.context))
+        else:
+            # Fuera de Edit Mode el aspecto debe ser el de por defecto.
+            reset_display()
     except Exception:
         pass
 
@@ -240,6 +256,10 @@ def _depsgraph_cb(_depsgraph):
             _last_state[0] = key
             if in_edit:
                 apply(_state.current_component_mode(bpy.context))
+            else:
+                # Al salir de Edit Mode, restaurar el aspecto por defecto del
+                # modo objeto (tema y overlays).
+                reset_display()
     except Exception:
         pass
 
