@@ -360,6 +360,94 @@ class ModozInsetDepth(bpy.types.Operator):
             self._snap = None
 
 
+class ModozDissolve(bpy.types.Operator):
+    bl_idname = "modoz.dissolve"
+    bl_label = "Dissolve (Modonize)"
+    bl_description = (
+        "Dissolve contextual: vértices o aristas según el modo activo, o las "
+        "aristas interiores de la isla de polígonos en modo polígono."
+    )
+    bl_options = {"REGISTER", "UNDO"}
+
+    conservar_verts: bpy.props.BoolProperty(
+        name="Conservar vértices",
+        description=(
+            "En modo aristas, no disolver los vértices intermedios del dissolve "
+            "(solo aplica al dissolve de aristas)"
+        ),
+        default=False,
+        options={"SKIP_SAVE"},
+    )
+
+    @classmethod
+    def poll(cls, context):
+        obj = context.active_object
+        return obj is not None and obj.type == "MESH" and obj.mode == "EDIT"
+
+    def execute(self, context):
+        mode = _state.current_component_mode(context)
+        if mode == "FACE":
+            return self._dissolve_island(context)
+        try:
+            if mode == "VERT":
+                bpy.ops.mesh.dissolve_verts(
+                    use_face_split=False, use_boundary_tear=False
+                )
+            else:  # EDGE
+                bpy.ops.mesh.dissolve_edges(
+                    use_verts=not self.conservar_verts, use_face_split=False
+                )
+            return {"FINISHED"}
+        except Exception:
+            return {"CANCELLED"}
+
+    def _dissolve_island(self, context):
+        """Dissolve de las aristas interiores de la isla de caras seleccionadas.
+
+        Solo se eliminan las aristas cuyas caras adyacentes están todas
+        seleccionadas (y sus vértices internos); el contorno se conserva.
+        """
+        obj = context.active_object
+        if obj is None or obj.type != "MESH":
+            return {"CANCELLED"}
+        bm = bmesh.from_edit_mesh(obj.data)
+        bm.edges.ensure_lookup_table()
+        interior = [
+            e for e in bm.edges
+            if e.is_manifold and all(f.select for f in e.link_faces)
+        ]
+        if interior:
+            bmesh.ops.dissolve_edges(
+                bm, edges=interior, use_verts=True, use_face_split=False
+            )
+            bmesh.update_edit_mesh(obj.data)
+        return {"FINISHED"}
+
+
+class ModozDelete(bpy.types.Operator):
+    bl_idname = "modoz.delete"
+    bl_label = "Borrar (Modonize)"
+    bl_description = (
+        "Borra según el modo activo: vértices en modo vértices, aristas en modo "
+        "aristas, o las caras de la isla de polígonos en modo polígono."
+    )
+    bl_options = {"REGISTER", "UNDO"}
+
+    @classmethod
+    def poll(cls, context):
+        obj = context.active_object
+        return obj is not None and obj.type == "MESH" and obj.mode == "EDIT"
+
+    def execute(self, context):
+        mode = _state.current_component_mode(context)
+        delete_type = "VERT" if mode == "VERT" else ("EDGE" if mode == "EDGE" else "FACE")
+        try:
+            bpy.ops.mesh.delete(type=delete_type)
+            return {"FINISHED"}
+        except Exception:
+            return {"CANCELLED"}
+
+
 class ModozBevel(bpy.types.Operator):
     bl_idname = "modoz.bevel"
     bl_label = "Bevel (Modonize)"
@@ -400,7 +488,7 @@ class ModozBevel(bpy.types.Operator):
         return {"FINISHED"}
 
 
-_CLASSES = (ModozSelectLoop, ModozInsetDepth, ModozBevel)
+_CLASSES = (ModozSelectLoop, ModozInsetDepth, ModozDissolve, ModozDelete, ModozBevel)
 
 
 def register():

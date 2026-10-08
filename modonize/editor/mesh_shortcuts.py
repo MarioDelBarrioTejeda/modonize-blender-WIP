@@ -9,6 +9,8 @@
 - [D]                  -> subdividir malla
 - [S]                  -> extrude (como la E de Blender)
 - [SHIFT+S]            -> edge crease
+- [BACKSPACE]          -> dissolve contextual (vértices/aristas/interior de isla)
+- [DEL]/Supr           -> borrar contextual (vértices/aristas/caras)
 
 Los defaults de Blender que chocan (B box-select, L select-linked, D, S) se
 desactivan temporalmente y se restauran al apagar el addon ("tecla prestada").
@@ -42,8 +44,10 @@ def register():
 
     global _addon_keymaps, _prestada, _temporarily_disabled
 
-    # Desactivar defaults que reemplazamos (B, L, D) en 'Mesh'.
-    _prestada = _state.prestada_off(kc, ("Mesh",), {"B", "L", "D", "S"})
+    # Desactivar defaults que reemplazamos (B, L, D, S, BACK_SPACE, DEL) en 'Mesh'.
+    _prestada = _state.prestada_off(
+        kc, ("Mesh",), {"B", "L", "D", "S", "BACK_SPACE", "DEL"}
+    )
     _temporarily_disabled = list(_prestada)
 
     def add(key, op, shift=False, head=True):
@@ -57,6 +61,10 @@ def register():
     add("B", "modoz.bevel")
     add("L", "modoz.select_loop")
     add("D", "mesh.subdivide")
+    ## Backspace: dissolve contextual (según modo de componentes).
+    add("BACK_SPACE", "modoz.dissolve")
+    ## Delete/Supr: borrado contextual (sustituye el menú de borrado por defecto).
+    add("DEL", "modoz.delete")
     ## Extrude (replicamos el E de Blender) y Edge Crease en Shift+S.
     add("S", "view3d.edit_mesh_extrude_move_normal")
     add("S", "transform.edge_crease", shift=True)
