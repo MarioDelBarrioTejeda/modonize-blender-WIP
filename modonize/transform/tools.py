@@ -47,12 +47,18 @@ _DISABLE_KEYMAPS = ("3D View", "Object Mode", "Mesh") + _EDITOR_KEYMAPS
 
 
 def _disable_defaults(kc, keys):
+    """Desactiva la tecla simple (W/E/R sin modificadores). Los atajos con
+    Shift/Ctrl/Alt/OS (Shift+E crease, Alt+E extrude, ...) se conservan."""
     for km_name in _DISABLE_KEYMAPS:
         km = kc.keymaps.get(km_name)
         if km is None:
             continue
         for kmi in km.keymap_items:
-            if kmi.type in keys and kmi.active:
+            if (
+                kmi.type in keys
+                and kmi.active
+                and not (kmi.shift or kmi.ctrl or kmi.alt or kmi.oskey)
+            ):
                 _temporarily_disabled.append((km, kmi))
                 kmi.active = False
 

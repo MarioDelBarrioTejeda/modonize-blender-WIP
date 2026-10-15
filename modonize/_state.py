@@ -64,14 +64,21 @@ def register_tool_safe(clazz):
 
 def prestada_off(kc, keymap_names, types):
     """'Tecla prestada': desactiva los items ajenos de `types` en los keymaps
-    indicados. Devuelve [(km, kmi)] para restaurarlos con `prestada_restore`."""
+    indicados. Devuelve [(km, kmi)] para restaurarlos con `prestada_restore`.
+
+    Solo se desactiva la tecla **simple** (sin modificadores): los atajos con
+    Shift/Ctrl/Alt/OS (p. ej. Shift+E crease, Alt+S shrink) se conservan."""
     out = []
     for name in keymap_names:
         km = kc.keymaps.get(name)
         if km is None:
             continue
         for kmi in km.keymap_items:
-            if kmi.type in types and kmi.active:
+            if (
+                kmi.type in types
+                and kmi.active
+                and not (kmi.shift or kmi.ctrl or kmi.alt or kmi.oskey)
+            ):
                 out.append((km, kmi))
                 kmi.active = False
     return out
