@@ -5,6 +5,12 @@
 W/E/R seleccionan los tools de Blender (`builtin.move/rotate/scale`) vía
 `wm.tool_set_by_id`, heredando gizmo, pivot, orientaciones y snapping.
 
+En modo inmediato (`transform_immediate`), W/E/R ejecutan los transforms
+nativos al instante (translate/rotate/resize). Además se añade W al
+'Transform Modal Map' para que, durante un translate activo, pulsar W otra
+vez conmute a Vertex/Edge Slide (los "railes" de las aristas conectadas),
+igual que el G-G nativo; W-W-W vuelve a mover.
+
 Como W/E/R tienen usos por defecto en Blender (W cicla selección, E extruye en
 edit, R rota modal), esos defaults se **desactivan temporalmente** mientras el
 addon está activo y se **restauran** al apagarlo (tecla "prestada").
@@ -42,6 +48,8 @@ _EDITOR_KEYMAPS = (
     "Dope Sheet",
     "NLA Editor",
     "Node Editor",
+    "Sequencer",
+    "SequencerPreview",
 )
 _DISABLE_KEYMAPS = ("3D View", "Object Mode", "Mesh") + _EDITOR_KEYMAPS
 
@@ -76,8 +84,9 @@ def register():
 
     _disable_defaults(kc, {"W", "E", "R"})
 
-    # W/E/R unificados en todos los editores: 3D, UV, keyframes (Graph/Dope/NLA)
-    # y nodos. transform.translate/rotate/resize se adaptan al contexto activo.
+    # W/E/R unificados en todos los editores: 3D, UV, keyframes (Graph/Dope/NLA),
+    # nodos y secuenciador (VSE). transform.translate/rotate/resize se adaptan
+    # al contexto activo.
     for km_name in _EDITOR_KEYMAPS:
         km = kc.keymaps.get(km_name)
         if km is None:
@@ -93,6 +102,18 @@ def register():
                 kmi = km.keymap_items.new("wm.tool_set_by_id", key, "PRESS", head=True)
                 kmi.properties.name = tool
                 _addon_keymaps.append((km, kmi))
+
+    # W-W durante un translate activo conmuta a Vertex/Edge Slide (el "G-G"
+    # nativo, pero con nuestra tecla). El filtrado por modo/contexto lo hace
+    # el poll_modal_item del propio Transform Modal Map: VERT_EDGE_SLIDE solo
+    # está activo durante TRANSLATION en mallas; TRANSLATE solo cuando el modo
+    # actual no es translate (así W-W-W vuelve a mover).
+    if prefs.transform_immediate:
+        modal_km = kc.keymaps.get("Transform Modal Map")
+        if modal_km is not None:
+            for propvalue in ("VERT_EDGE_SLIDE", "TRANSLATE"):
+                kmi = modal_km.keymap_items.new_modal(propvalue, "W", "PRESS")
+                _addon_keymaps.append((modal_km, kmi))
 
 
 def unregister():
