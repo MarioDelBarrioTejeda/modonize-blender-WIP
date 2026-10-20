@@ -11,6 +11,14 @@ nativos al instante (translate/rotate/resize). Además se añade W al
 vez conmute a Vertex/Edge Slide (los "railes" de las aristas conectadas),
 igual que el G-G nativo; W-W-W vuelve a mover.
 
+En el 3D View, W arranca `modoz.w_move` y E `modoz.e_rotate` (ver
+view_transform.py): W mueve en los dos ejes que miran a la vista y E rota
+solo alrededor del eje de profundidad, calculado en el espacio de la
+orientación de transformación activa (Global, Local, View, personalizada...);
+con orientación Normal, W mueve solo a lo largo de la normal y E rota sobre
+ella. En el resto de editores W y E siguen siendo los transforms nativos
+libres.
+
 Como W/E/R tienen usos por defecto en Blender (W cicla selección, E extruye en
 edit, R rota modal), esos defaults se **desactivan temporalmente** mientras el
 addon está activo y se **restauran** al apagarlo (tecla "prestada").
@@ -93,7 +101,14 @@ def register():
             continue
         if prefs.transform_immediate:
             # Modo inmediato: W/E/R transforman al instante, como G/R/S.
+            # En el 3D View, W/E pasan por modoz.w_move/modoz.e_rotate:
+            # translate pre-restringido a los dos ejes que miran a la vista y
+            # rotate sobre el eje de profundidad, según la orientación activa
+            # (ver view_transform.py).
+            _view_ops = {"W": "modoz.w_move", "E": "modoz.e_rotate"}
             for key, opname in _immediate_slots().items():
+                if km_name == "3D View" and key in _view_ops:
+                    opname = _view_ops[key]
                 kmi = km.keymap_items.new(opname, key, "PRESS", head=True)
                 _addon_keymaps.append((km, kmi))
         else:
